@@ -2,9 +2,9 @@ const util = require("util");
 const mysql = require("mysql");
 const pool = mysql.createPool({
   connectionLimit: 10,
-  host: "us-cdbr-iron-east-01.cleardb.net",
-  user: "b1068afa3d8259",
-  password: "abd3ac02",
+  host: process.env.DATABASE_HOST,
+  user: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD,
   database: "heroku_f4d53bdd9351c62",
 });
 
