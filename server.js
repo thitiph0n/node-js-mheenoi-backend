@@ -21,7 +21,10 @@ const loginMiddleware = async (req, res, next) => {
     ) {
       req.email = result[0].email;
       next();
-    } else res.json("Wrong username and password");
+    } else {
+      res.json("Wrong username and password");
+      res.status(400).end();
+    }
   } catch (error) {
     res.status(400).end();
   }
