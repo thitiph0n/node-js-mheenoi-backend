@@ -4,12 +4,11 @@ const pool = require("./database");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const bodyPasser = require("body-passer");
 
 //cross origin allow
 app.use(cors());
 //accept Json body
-app.use(bodyPasser.json());
+app.use(express.json());
 
 const AuthenticateByToken = (req, res, next) => {
   const authHeader = req.header["Authorization"];
