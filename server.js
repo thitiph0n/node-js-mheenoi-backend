@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const pool = require("./database");
+const authorization = require("./authorization");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
@@ -10,51 +11,26 @@ app.use(cors());
 //accept Json body
 app.use(express.json());
 
-const AuthenticateByToken = (req, res, next) => {
-  const authHeader = req.header["Authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  if (token == null) return res.status(401);
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) return res.status(403);
-    req.user = user;
-    next();
-  });
-};
-
-function verifyToken(req, res, next) {
-  //Get auth header value
-  const bearerHeader = req.headers["authorization"];
-  //Check bearer
-  if (typeof bearerHeader !== "undefined") {
-    //Split at the space
-    const bearer = bearerHeader.split(" ");
-    // Get token
-    const bearerToken = bearer[1];
-    //Set the token
-    req.token = bearerToken;
-    //authorization
-    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, (err, authData) => {
-      if (!err) {
-        //send authData
-        req.authData = authData;
-        //Next middleware
-        next();
-      } else {
-        res.sendStatus(403);
-      }
-    });
-  } else {
-    res.sendStatus(401);
-  }
-}
-
 app.get("/", (req, res) =>
   res.send("Welcome to MHEENOI BACKEND By CHAI company")
 );
 
-app.get("/api", verifyToken, (req, res) =>
+app.get("/api", authorization, (req, res) =>
   res.json({ api: "MHEENOI BACKEND", version: 0.1, authData: req.authData })
 );
+
+app.get("/api/user", authorization, async (req, res) => {
+  try {
+    const table = req.authData.sub[0] === "1" ? "student" : "employee";
+    const queryResult = await pool.query(
+      `SELECT userId, firstName, lastName, email FROM ${table} WHERE userId = "${req.authData.sub}";`
+    );
+    res.json(queryResult[0]);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(204);
+  }
+});
 
 app.get("/users", async (req, res) => {
   try {
@@ -116,7 +92,7 @@ app.post("/login", async (req, res) => {
         iat: new Date().getTime(),
       };
       const webToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "15m",
+        expiresIn: "10 min",
       });
       res.json({ jwt: webToken, type: req.body.userId[0] });
     }
