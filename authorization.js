@@ -16,8 +16,13 @@ function authorization(req, res, next) {
       if (!err) {
         //send authData
         req.authData = authData;
-        //Next middleware
-        next();
+        //check expire
+        if (Date.now() - authData.iat <= 1800000) {
+          //Next middleware
+          next();
+        } else {
+          res.sendStatus(403);
+        }
       } else {
         res.sendStatus(403);
       }

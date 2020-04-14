@@ -91,10 +91,11 @@ app.post("/login", async (req, res) => {
         sub: req.body.userId,
         iat: new Date().getTime(),
       };
-      const webToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "10 min",
-      });
+      const webToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET);
       res.json({ jwt: webToken, type: req.body.userId[0] });
+    } else {
+      console.log(error);
+      res.status(400).json({ message: "Wrong userId or password" });
     }
   } catch (error) {
     console.log(error);
