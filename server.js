@@ -31,6 +31,18 @@ app.get("/api", authorization, (req, res) =>
   res.json({ api: "MHEENOI BACKEND", version: 0.2, authData: req.authData })
 );
 
+app.get("/api/user", authorization, async (req, res) => {
+  try {
+    const queryResult = await pool.query(
+      "SELECT * FROM student WHERE studentId=?",
+      req.authData.sub
+    );
+    res.json({ payload: queryResult });
+  } catch (error) {
+    res.status(500).json({ message: error.code });
+  }
+});
+
 app.post("/register", async (req, res) => {
   const user = req.body;
   try {
