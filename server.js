@@ -1,12 +1,13 @@
 const express = require("express");
 const app = express();
-const pool = require("./_helper/database");
-const authorization = require("./_helper/authorization");
+const pool = require("./helpers/database");
+const authorization = require("./helpers/authorization");
 const cors = require("cors");
 
 const bcrypt = require("bcrypt");
 
 const students = require("./_students/students");
+const employees = require("./_employees/employees");
 const login = require("./login");
 
 if (process.env.NODE_ENV !== "production") require("dotenv").config();
@@ -18,6 +19,8 @@ app.use(express.json());
 
 app.use("/api/students", students);
 
+app.use("/api/employees", employees);
+
 app.use("/login", login);
 
 app.get("/", (req, res) =>
@@ -27,38 +30,6 @@ app.get("/", (req, res) =>
 app.get("/api", authorization, (req, res) =>
   res.json({ api: "MHEENOI BACKEND", version: 0.2, authData: req.authData })
 );
-
-app.get("/api/user", authorization, async (req, res) => {
-  try {
-    const table = req.authData.sub[0] === "1" ? "student" : "employee";
-    const queryResult = await pool.query(
-      `SELECT userId, firstName, lastName, email FROM ${table} WHERE userId = "${req.authData.sub}";`
-    );
-    res.json(queryResult[0]);
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(204);
-  }
-});
-
-app.get("/users", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT * FROM user");
-    res.json(result);
-  } catch (error) {
-    res.json(error);
-  }
-});
-
-app.get("/users/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await pool.query(`SELECT * FROM user WHERE userid = ?`, id);
-    res.json(result[0]);
-  } catch (error) {
-    res.status(400).end();
-  }
-});
 
 app.post("/register", async (req, res) => {
   const user = req.body;

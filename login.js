@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const pool = require("./_helper/database");
+const pool = require("./helpers/database");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
@@ -14,12 +14,12 @@ router.post("/", async (req, res) => {
     //check user with database
     if (userId[0] === "1") {
       queryResult = await pool.query(
-        `SELECT userId, password, firstName FROM student WHERE userId = ?`,
+        `SELECT studentId, password, firstName FROM student WHERE studentId = ?`,
         userId
       );
     } else if (userId[0] === "2" || userId[0] === "3") {
       queryResult = await pool.query(
-        `SELECT userId, password, firstName, position FROM employee WHERE userId = ?`,
+        `SELECT employeeId, password, firstName, position FROM employee WHERE employeeId = ?`,
         userId
       );
     } else {
@@ -31,9 +31,11 @@ router.post("/", async (req, res) => {
       const payload = {
         sub: req.body.userId,
         type: req.body.userId[0],
-        iat: new Date().getTime(),
+        iat: Date.now(),
       };
-      const webToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET);
+      const webToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "30min",
+      });
       res.json({ jwt: webToken, type: req.body.userId[0] });
     } else {
       console.log(error);
