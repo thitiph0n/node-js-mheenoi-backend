@@ -61,19 +61,22 @@ router.post("/", async (req, res) => {
   }
 });
 
-// router.post("/", async (req, res) => {
-//   if (req.authData.type === "2" || req.authData.type === "3") {
-//     const payload = req.body.payload;
-//     res.json({ payload });
-//   } else {
-//     res.sendStatus(403);
-//   }
-// });
-
 //get student information by studentId
 router.get("/:studentId", (req, res) => {});
 //update student information by studentId
 router.put("/:studentId", (req, res) => {});
+
+router.get("/dashboard", authorization, async (req, res) => {
+  try {
+    const queryResult = await pool.query(
+      "SELECT * FROM student WHERE studentId=?",
+      req.authData.sub
+    );
+    res.json({ payload: queryResult });
+  } catch (error) {
+    res.status(500).json({ message: error.code });
+  }
+});
 
 router.post("/hashing", async (req, res) => {
   const rawPassword = req.body.payload.password;
