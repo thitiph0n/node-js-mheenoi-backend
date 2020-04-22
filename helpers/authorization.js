@@ -21,10 +21,10 @@ function authorization(req, res, next) {
           //Next middleware
           next();
         } else {
-          res.sendStatus(403);
+          res.sendStatus(401);
         }
       } else {
-        res.sendStatus(403);
+        res.sendStatus(401);
       }
     });
   } else {
