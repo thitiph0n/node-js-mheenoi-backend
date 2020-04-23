@@ -60,14 +60,7 @@ router.post("/", async (req, res) => {
     res.sendStatus(403);
   }
 });
-
-//get student information by studentId
-router.get("/:studentId", (req, res) => {});
-//update student information by studentId
-router.put("/:studentId", (req, res) => {});
-
 router.get("/dashboard", async (req, res) => {
-  console.log("authData");
   try {
     const queryResult = await pool.query(
       "SELECT * FROM student WHERE studentId=?",
@@ -78,8 +71,16 @@ router.get("/dashboard", async (req, res) => {
     res.status(500).json({ message: error.code });
   }
 });
+//get student information by studentId
+router.get("/:studentId", (req, res) => {
+  res.json({ message: "student information by studentId" });
+});
+//update student information by studentId
+router.put("/:studentId", (req, res) => {
+  res.json({ message: "student information by studentId" });
+});
 
-router.get("/ant", (req, res) => {
+router.get("/test", (req, res) => {
   res.json({ message: "you are right" });
 });
 
