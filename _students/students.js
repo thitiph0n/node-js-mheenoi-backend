@@ -62,8 +62,16 @@ router.post("/", async (req, res) => {
 });
 
 //get student information by studentId
-router.get("/:studentId/info", (req, res) => {
-  res.json({ message: "student information by studentId" });
+router.get("/:studentId/info", async (req, res) => {
+  try {
+    const queryResult = await pool.query(
+      "SELECT * FROM student WHERE studentId=?",
+      req.params.studentId
+    );
+    res.json({ payload: queryResult });
+  } catch (error) {
+    res.status(500).json({ message: error.code });
+  }
 });
 
 //update student information by studentId
