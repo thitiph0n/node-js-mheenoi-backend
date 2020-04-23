@@ -60,6 +60,17 @@ router.post("/", async (req, res) => {
     res.sendStatus(403);
   }
 });
+
+//get student information by studentId
+router.get("/:studentId/info", (req, res) => {
+  res.json({ message: "student information by studentId" });
+});
+
+//update student information by studentId
+router.put("/:studentId/info", (req, res) => {
+  res.json({ message: "student information by studentId" });
+});
+
 router.get("/dashboard", async (req, res) => {
   try {
     const queryResult = await pool.query(
@@ -70,14 +81,6 @@ router.get("/dashboard", async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.code });
   }
-});
-//get student information by studentId
-router.get("/:studentId", (req, res) => {
-  res.json({ message: "student information by studentId" });
-});
-//update student information by studentId
-router.put("/:studentId", (req, res) => {
-  res.json({ message: "student information by studentId" });
 });
 
 router.get("/test", (req, res) => {
