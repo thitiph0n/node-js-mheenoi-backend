@@ -61,6 +61,22 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.get("/info", async (req, res) => {
+  try {
+    const queryResult = await pool.query(
+      "SELECT * FROM student WHERE studentId=?",
+      req.authData.sub
+    );
+    res.json({
+      requestedTime: Date.now(),
+      requestedBy: req.authData.sub,
+      payload: queryResult,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.code });
+  }
+});
+
 //get student information by studentId
 router.get("/:studentId/info", async (req, res) => {
   try {
