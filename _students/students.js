@@ -63,7 +63,7 @@ router.post("/", async (req, res) => {
 router.get("/info", async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "SELECT * FROM student WHERE studentId=?",
+      "SELECT * FROM student_info WHERE studentId=?",
       req.authData.sub
     );
     res.json({
