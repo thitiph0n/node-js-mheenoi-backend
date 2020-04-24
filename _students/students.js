@@ -3,7 +3,6 @@ const router = express.Router();
 const pool = require("../helpers/database");
 const bcrypt = require("bcrypt");
 const authorization = require("../helpers/authorization");
-const generateId = require("../tools/generateId");
 
 router.use(authorization);
 
@@ -97,18 +96,20 @@ router.put("/:studentId/info", (req, res) => {
 
 router.get("/dashboard", async (req, res) => {
   try {
-    const queryResult = await pool.query(
-      "SELECT * FROM student WHERE studentId=?",
+    const queryResult1 = await pool.query(
+      "SELECT * FROM student_info WHERE studentId=?",
       req.authData.sub
     );
-    res.json({ payload: queryResult });
+    const queryResult2 = await pool.query(
+      "SELECT * FROM student_scholarship WHERE studentId=? AND status = ? AND yearOfRequest =?",
+      [req.authData.sub, "Approve", 2020]
+    );
+    res.json({
+      payload: { info: queryResult1[0], scholarship: queryResult2[0] },
+    });
   } catch (error) {
-    res.status(500).json({ message: error.code });
+    res.status(500).json({ error: { message: error.code } });
   }
-});
-
-router.get("/test", (req, res) => {
-  res.json({ message: "you are right" });
 });
 
 module.exports = router;
