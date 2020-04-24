@@ -50,7 +50,7 @@ router.post("/", async (req, res) => {
           hashedPassword,
         ]
       );
-      res.status(201).json({ message: "Register success", payload: payload });
+      res.status(201).json({ message: "Register success" });
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: `Register fail (${error.code})` });
@@ -90,48 +90,46 @@ router.get("/:studentId/info", async (req, res) => {
 });
 
 //update student information by studentId
-router.put("/:studentId/info", (req, res) => {
+router.put("/:studentId/info", async (req, res) => {
   const payload = req.body.payload;
-    try {
-      //update to database
-      const sql = " UPDATE student SET title=?, gender=?, firstName=?, \
+  try {
+    //update to database
+    const sql =
+      " UPDATE student SET title=?, gender=?, firstName=?, \
       lastName=?, idCardNumber=? , email=?, dob=?, phoneNo = ?, bloodType=?,\
       address=?, parent1FirstName= ? , parent1LastName = ?, parent1Tel=?,\
       parent1Career=?,parent1Income=?, parent1Relation=?, parent2FirstName=?,\
       parent2LastName=?, parent2Tel=?, parent2Career=?, parent2Income=?, parent2Relation=?\
-      WHERE studentId = ?"
-      await pool.query(
-        sql,
-        [
-          payload.title,
-          payload.gender,
-          payload.firstName,
-          payload.lastName,
-          payload.idCardNumber,
-          payload.email,
-          payload.dob,
-          payload.phoneNo,
-          payload.bloodType,
-          payload.address,
-          payload.parent1FirstName , 
-          payload.parent1LastName , 
-          payload.parent1Tel,
-          payload.parent1Career,
-          payload.parent1Income, 
-          payload.parent1Relation, 
-          payload.parent2FirstName,
-          payload.parent2LastName,
-          payload.parent2Tel, 
-          payload.parent2Career, 
-          payload.parent2Income, 
-          payload.parent2Relation,
-          req.params.studentId
-        ]
-      );
-      res.status(201).json({ message: "Update successful"});
-    } catch (error) {
-      res.status(500).json({ error: { message: error.code } });
-    }
+      WHERE studentId = ?";
+    await pool.query(sql, [
+      payload.title,
+      payload.gender,
+      payload.firstName,
+      payload.lastName,
+      payload.idCardNumber,
+      payload.email,
+      payload.dob,
+      payload.phoneNo,
+      payload.bloodType,
+      payload.address,
+      payload.parent1FirstName,
+      payload.parent1LastName,
+      payload.parent1Tel,
+      payload.parent1Career,
+      payload.parent1Income,
+      payload.parent1Relation,
+      payload.parent2FirstName,
+      payload.parent2LastName,
+      payload.parent2Tel,
+      payload.parent2Career,
+      payload.parent2Income,
+      payload.parent2Relation,
+      req.params.studentId,
+    ]);
+    res.status(201).json({ message: "Update successful" });
+  } catch (error) {
+    res.status(500).json({ error: { message: error.code } });
+  }
 });
 
 router.get("/dashboard", async (req, res) => {
