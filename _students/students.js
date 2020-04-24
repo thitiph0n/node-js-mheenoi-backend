@@ -81,7 +81,7 @@ router.get("/info", async (req, res) => {
 router.get("/:studentId/info", async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "SELECT * FROM student WHERE studentId=?",
+      "SELECT * FROM student_info WHERE studentId=?",
       req.params.studentId
     );
     res.json({ payload: queryResult });
@@ -109,19 +109,6 @@ router.get("/dashboard", async (req, res) => {
 
 router.get("/test", (req, res) => {
   res.json({ message: "you are right" });
-});
-
-router.post("/hashing", async (req, res) => {
-  const rawPassword = req.body.payload.password;
-  try {
-    const hashedPassword = await bcrypt.hash(rawPassword, 10);
-    res.json({
-      plaintext: rawPassword,
-      hashedPassword: hashedPassword,
-    });
-  } catch (error) {
-    res.sendStatus(500);
-  }
 });
 
 module.exports = router;
