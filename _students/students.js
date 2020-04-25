@@ -3,24 +3,22 @@ const router = express.Router();
 const pool = require("../helpers/database");
 const bcrypt = require("bcrypt");
 const authorization = require("../helpers/authorization");
+const globalConst = require("../helpers/constants");
+const hasRole = require("../helpers/hasRole");
 
 router.use(authorization);
 
 //get all students list
-router.get("/", async (req, res) => {
-  //Check permission (unsafe)
-  if (req.authData.type === "2" || req.authData.type === "3") {
-    try {
-      const queryResult = await pool.query("SELECT * FROM student");
-      res.json({ payload: queryResult });
-    } catch (error) {
-      res.status(500).json({ message: error.code });
-    }
-  } else {
-    res.sendStatus(403);
+router.get("/", hasRole([2, 3]), async (req, res) => {
+  try {
+    const queryResult = await pool.query("SELECT * FROM student");
+    res.json({ payload: queryResult });
+  } catch (error) {
+    res.status(500).json({ error: { message: error.code } });
   }
 });
-//register student
+
+//register student(unfinished)
 router.post("/", async (req, res) => {
   if (req.authData.type === "2" || req.authData.type === "3") {
     const payload = req.body.payload;
@@ -60,6 +58,7 @@ router.post("/", async (req, res) => {
   }
 });
 
+//get student information by authData
 router.get("/info", async (req, res) => {
   try {
     const queryResult = await pool.query(
@@ -83,7 +82,11 @@ router.get("/:studentId/info", async (req, res) => {
       "SELECT * FROM student_info WHERE studentId=?",
       req.params.studentId
     );
-    res.json({ payload: queryResult });
+    res.json({
+      requestedTime: Date.now(),
+      requestedBy: req.authData.sub,
+      payload: queryResult,
+    });
   } catch (error) {
     res.status(500).json({ error: { message: error.code } });
   }
@@ -140,14 +143,17 @@ router.get("/dashboard", async (req, res) => {
     );
     const queryResult2 = await pool.query(
       "SELECT * FROM student_scholarship WHERE studentId=? AND status = ? AND yearOfRequest =?",
-      [req.authData.sub, "Approve", 2020]
+      [req.authData.sub, "approve", globalConst.academicYear]
     );
     const queryResult3 = await pool.query(
-      "select enrollment.enrollmentId,enrollmentdetail.subjectId,subject.subjectName,enrollmentdetail.sectionId from enrollment\
-      left join enrollmentdetail on enrollment.enrollmentId = enrollmentdetail.enrollmentId\
-      left join subject on enrollmentdetail.subjectId=subject.subjectId\
+      "select enrollmentdetail.subjectId,subject.subjectName,enrollmentdetail.sectionId,employee.firstName,employee.lastName\
+      from enrollment\
+      join enrollmentdetail on enrollment.enrollmentId = enrollmentdetail.enrollmentId\
+      join subject on enrollmentdetail.subjectId=subject.subjectId\
+      join sectionlecturer on enrollmentdetail.sectionId=sectionlecturer.sectionId and enrollmentdetail.subjectId=sectionlecturer.subjectId\
+      join employee on employee.employeeId=sectionlecturer.lecturerId\
       where studentId = ? and year = ? and semester = ?",
-      [req.authData.sub, 2020, 2]
+      [req.authData.sub, globalConst.academicYear, globalConst.semester]
     );
     const queryResult4 = await pool.query(
       "select (sum( enrollmentdetail.grade * subject.credit) /\
@@ -169,6 +175,24 @@ router.get("/dashboard", async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: { message: error.code } });
+  }
+});
+
+router.get("/scholarship", async (req, res) => {
+  try {
+    const queryResult = await pool.query(
+      "SELECT * FROM student_scholarship WHERE studentId=? ",
+      [req.authData.sub]
+    );
+    res.json({
+      requestedTime: Date.now(),
+      requestedBy: req.authData.sub,
+      payload: queryResult,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
   }
 });
 

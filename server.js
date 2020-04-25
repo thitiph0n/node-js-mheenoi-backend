@@ -8,6 +8,8 @@ const students = require("./_students/students");
 
 const employees = require("./_employees/employees");
 
+const scholarships = require("./_scholarships/scholarships");
+
 const login = require("./login");
 
 if (process.env.NODE_ENV !== "production") require("dotenv").config();
@@ -21,6 +23,8 @@ app.use(express.json());
 app.use("/api/students", students);
 
 app.use("/api/employees", employees);
+
+app.use("/api/scholarships", scholarships);
 
 app.use("/login", login);
 

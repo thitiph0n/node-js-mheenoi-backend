@@ -31,6 +31,7 @@ router.post("/", async (req, res) => {
       const payload = {
         sub: req.body.userId,
         type: req.body.userId[0],
+        role: req.body.userId[0],
         iat: Date.now(),
       };
       const webToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
