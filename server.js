@@ -18,6 +18,8 @@ const scholarships = require("./modules/scholarships");
 
 const login = require("./modules/login");
 
+const setPassword = require("./modules/setPassword");
+
 if (process.env.NODE_ENV !== "production") require("dotenv").config();
 
 //cross origin allow
@@ -37,6 +39,8 @@ app.use("/api/staffs", staffs);
 app.use("/api/scholarships", scholarships);
 
 app.use("/login", login);
+
+app.use("/set-password", setPassword);
 
 app.get("/", (req, res) =>
   res.send("Welcome to MHEENOI BACKEND By CHAI company")

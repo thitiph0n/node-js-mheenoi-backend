@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../helpers/database");
-const bcrypt = require("bcrypt");
 const authorization = require("../helpers/authorization");
 const globalConst = require("../helpers/constants");
 const hasRole = require("../helpers/hasRole");
@@ -33,20 +32,33 @@ router.post("/", hasRole([3]), async (req, res) => {
       departmentId: payload.departmentId,
     });
     //hashing password
-    const hashedPassword = await bcrypt.hash(payload.password, 10);
+    const defaultPassword = payload.dob.toString();
     //insert to database
-    const sql = "";
+    const sql =
+      "INSERT INTO student(studentId, title, gender, firstName,\
+                lastName, idCardNumber, degree, departmentId, program, year,\
+                picturePath, email, dob, phoneNo, bloodType, address, password,\
+                parent1FirstName, parent1LastName, parent1Tel, parent1Career, \
+                parent1Income, parent1Relation, parent2FirstName, parent2LastName, \
+                parent2Tel, parent2Career, parent2Income, parent2Relation)";
     await pool.query(sql, [
+      studentId,
       payload.title,
       payload.gender,
       payload.firstName,
       payload.lastName,
       payload.idCardNumber,
+      payload.degree,
+      payload.departmentId,
+      payload.program,
+      payload.year,
+      "/profile/student.jpg",
       payload.email,
       payload.dob,
       payload.phoneNo,
       payload.bloodType,
       payload.address,
+      defaultPassword,
       payload.parent1FirstName,
       payload.parent1LastName,
       payload.parent1Tel,

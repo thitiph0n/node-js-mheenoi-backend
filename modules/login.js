@@ -39,12 +39,22 @@ router.post("/", async (req, res) => {
       });
       res.json({ jwt: webToken, type: req.body.userId[0] });
     } else {
-      console.log(error);
-      res.status(400).json({ message: "Wrong userId or password" });
+      if (rawPassword === queryResult[0].password) {
+        res.status(400).json({
+          error: { message: "Using not secure password", errorCode: 200 },
+        });
+      } else {
+        console.log(error);
+        res.status(400).json({
+          error: { message: "Wrong userId or password", errorCode: 100 },
+        });
+      }
     }
   } catch (error) {
     console.log(error);
-    res.status(400).json({ message: "Wrong userId or password" });
+    res.status(400).json({
+      error: { message: "Wrong userId or password", errorCode: 100 },
+    });
   }
 });
 
