@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const authorization = require("../helpers/authorization");
 const globalConst = require("../helpers/constants");
 const hasRole = require("../helpers/hasRole");
+const generateId = require("../tools/generateId");
 
 router.use(authorization);
 
@@ -20,44 +21,50 @@ router.get("/", hasRole([2, 3]), async (req, res) => {
   }
 });
 
-//register student(unfinished)
-router.post("/", async (req, res) => {
-  if (req.authData.type === "2" || req.authData.type === "3") {
-    const payload = req.body.payload;
-
-    try {
-      const hashedPassword = await bcrypt.hash(payload.password, 10);
-      //insert to database
-      await pool.query(
-        "INSERT INTO student(studentId,title,gender,firstName,lastName,idCardNumber,degree,departmentId,program,year,picturePath,email,dob,phoneNo,bloodType,address,password) VALUE(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);",
-        [
-          payload.studentId,
-          payload.title,
-          payload.gender,
-          payload.firstName,
-          payload.lastName,
-          payload.idCardNumber,
-          payload.degree,
-          payload.departmentId,
-          payload.program,
-          payload.year,
-          payload.picturePath,
-          payload.email,
-          payload.dob,
-          payload.phoneNo,
-          payload.bloodType,
-          payload.address,
-          hashedPassword,
-        ]
-      );
-      res.status(201).json({ message: "Register success" });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ error: { message: error.sqlMessage, code: error.code } });
-    }
-  } else {
-    res.sendStatus(403);
+//register student
+router.post("/", hasRole([3]), async (req, res) => {
+  const payload = req.body.payload;
+  try {
+    //generate Id
+    const studentId = await generateId({
+      role: 1,
+      academicYear: globalConst.academicYear,
+      program: payload.program,
+      departmentId: payload.departmentId,
+    });
+    //hashing password
+    const hashedPassword = await bcrypt.hash(payload.password, 10);
+    //insert to database
+    const sql = "";
+    await pool.query(sql, [
+      payload.title,
+      payload.gender,
+      payload.firstName,
+      payload.lastName,
+      payload.idCardNumber,
+      payload.email,
+      payload.dob,
+      payload.phoneNo,
+      payload.bloodType,
+      payload.address,
+      payload.parent1FirstName,
+      payload.parent1LastName,
+      payload.parent1Tel,
+      payload.parent1Career,
+      payload.parent1Income,
+      payload.parent1Relation,
+      payload.parent2FirstName,
+      payload.parent2LastName,
+      payload.parent2Tel,
+      payload.parent2Career,
+      payload.parent2Income,
+      payload.parent2Relation,
+    ]);
+    res.status(201).json({ message: "register successful" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
   }
 });
 

@@ -4,10 +4,14 @@ const authorization = require("./helpers/authorization");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 
+const generateId = require("./tools/generateId");
+
 const students = require("./modules/students");
 
 const employees = require("./modules/employees");
+
 const lecturers = require("./modules/lecturers");
+
 const staffs = require("./modules/staffs");
 
 const scholarships = require("./modules/scholarships");
@@ -51,6 +55,25 @@ app.post("/hashing", async (req, res) => {
       hashedPassword: hashedPassword,
     });
   } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
+app.post("/testing/id", async (req, res) => {
+  const payload = req.body.payload;
+  console.log(payload);
+  try {
+    const studentId = await generateId({
+      role: 2,
+      academicYear: 2020,
+      program: payload.program,
+      departmentId: payload.departmentId,
+      position: payload.position,
+    });
+    res.json({ studentId: studentId });
+  } catch (error) {
+    console.log(error);
+
     res.sendStatus(500);
   }
 });
