@@ -14,7 +14,9 @@ router.get("/", hasRole([2, 3]), async (req, res) => {
     const queryResult = await pool.query("SELECT * FROM student");
     res.json({ payload: queryResult });
   } catch (error) {
-    res.status(500).json({ error: { message: error.code } });
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
   }
 });
 
@@ -50,8 +52,9 @@ router.post("/", async (req, res) => {
       );
       res.status(201).json({ message: "Register success" });
     } catch (error) {
-      console.log(error);
-      res.status(500).json({ message: `Register fail (${error.code})` });
+      res
+        .status(500)
+        .json({ error: { message: error.sqlMessage, code: error.code } });
     }
   } else {
     res.sendStatus(403);
@@ -71,7 +74,9 @@ router.get("/info", async (req, res) => {
       payload: queryResult,
     });
   } catch (error) {
-    res.status(500).json({ message: error.code });
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
   }
 });
 
@@ -88,7 +93,9 @@ router.get("/:studentId/info", async (req, res) => {
       payload: queryResult,
     });
   } catch (error) {
-    res.status(500).json({ error: { message: error.code } });
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
   }
 });
 
@@ -131,7 +138,9 @@ router.put("/:studentId/info", async (req, res) => {
     ]);
     res.status(201).json({ message: "Update successful" });
   } catch (error) {
-    res.status(500).json({ error: { message: error.code } });
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
   }
 });
 
@@ -174,7 +183,9 @@ router.get("/dashboard", async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ error: { message: error.code } });
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
   }
 });
 

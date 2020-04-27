@@ -4,13 +4,15 @@ const authorization = require("./helpers/authorization");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 
-const students = require("./_students/students");
+const students = require("./modules/students");
 
-const employees = require("./_employees/employees");
+const employees = require("./modules/employees");
+const lecturers = require("./modules/lecturers");
+const staffs = require("./modules/staffs");
 
-const scholarships = require("./_scholarships/scholarships");
+const scholarships = require("./modules/scholarships");
 
-const login = require("./login");
+const login = require("./modules/login");
 
 if (process.env.NODE_ENV !== "production") require("dotenv").config();
 
@@ -23,6 +25,10 @@ app.use(express.json());
 app.use("/api/students", students);
 
 app.use("/api/employees", employees);
+
+app.use("/api/lecturers", lecturers);
+
+app.use("/api/staffs", staffs);
 
 app.use("/api/scholarships", scholarships);
 
