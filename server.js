@@ -1,9 +1,11 @@
+//import frameworks
 const express = require("express");
 const app = express();
 const authorization = require("./helpers/authorization");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 
+//import modules
 const generateId = require("./tools/generateId");
 
 const students = require("./modules/students");
@@ -22,6 +24,7 @@ const login = require("./modules/login");
 
 const setPassword = require("./modules/setPassword");
 
+//using dotenv in development
 if (process.env.NODE_ENV !== "production") require("dotenv").config();
 
 //cross origin allow

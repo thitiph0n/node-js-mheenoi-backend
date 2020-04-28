@@ -60,6 +60,7 @@ router.get("/requests", hasRole([3]), async (req, res) => {
   }
 });
 
+//request a scholarship
 router.post("/requests", hasRole([1]), async (req, res) => {
   const payload = req.body.payload;
   try {
@@ -124,7 +125,7 @@ router.put("/requests/status", hasRole([3]), async (req, res) => {
 router.get("/:scholarshipId", async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "SELECT * FROM scholarship_request\
+      "SELECT * FROM scholarship_list\
         WHERE scholarshipId=?",
       req.params.scholarshipId
     );
@@ -140,6 +141,7 @@ router.get("/:scholarshipId", async (req, res) => {
   }
 });
 
+//DANGER ZONE !!
 //delete scholarship
 router.delete("/:scholarshipId", hasRole([3]), async (req, res) => {
   try {

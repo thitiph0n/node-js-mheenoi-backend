@@ -9,27 +9,139 @@ const hasRole = require("../helpers/hasRole");
 router.use(authorization);
 
 //list all activities
-router.get("/", async (req, res) => {});
+router.get("/", async (req, res) => {
+  try {
+    const queryResult = await pool.query("SELECT * FROM activity");
+    res.json({
+      requestedTime: Date.now(),
+      requestedBy: req.authData.sub,
+      payload: queryResult,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
+  }
+});
 
 //request activity
-router.post("/", async (req, res) => {});
+router.post("/", hasRole([1]), async (req, res) => {
+  //insert activity
+  const payload = req.body.payload;
+  try {
+    const queryResult = await pool.query(
+      "INSERT INTO activity \
+        (name, startTime, endTime, detail, location)\
+        VALUE(?,?,?,?,?)",
+      [
+        payload.name,
+        payload.startTime,
+        payload.endTime,
+        payload.detail,
+        payload.location,
+      ]
+    );
+    let values = "";
+    //loop all staffs in array
+    const staffs = payload.staffs;
+    for (staff in staffs) {
+      values += `(${queryResult.insertId},"${staffs[staff].studentId}","${staffs[staff].duty}"),`;
+    }
+    values = values.slice(0, values.length - 1);
+    //insert staff
+    const queryResult2 = await pool.query(
+      `INSERT INTO activity_staff\
+        (activityId,studentId,duty)\
+        VALUE ${values}`
+    );
+    res.status(201).json({
+      status: "request successful",
+      payload: [queryResult1, queryResult2],
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: {
+        message: error.sqlMessage || "unknown error",
+        code: error.code,
+      },
+    });
+  }
+});
 
-//get activity by Id
-router.get("/:activityId", async (req, res) => {});
+//get activity by activityId
+router.get("/:activityId", async (req, res) => {
+  try {
+    const queryResult = await pool.query(
+      "SELECT * FROM activity WHERE activityId=?",
+      parseInt(req.params.activityId)
+    );
+    res.json({
+      requestedTime: Date.now(),
+      requestedBy: req.authData.sub,
+      payload: queryResult,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
+  }
+});
 
-//edit activity by Id
-router.put("/:activityId", async (req, res) => {});
+//delete activity by activityId
+router.delete("/:activityId", async (req, res) => {
+  try {
+    const queryResult = await pool.query(
+      "DELETE FROM activity\
+          WHERE activityId=?",
+      [parseInt(req.params.activityId)]
+    );
+    res.status(201).json({
+      status: `Delete activityId:${req.params.activityId} successful`,
+      payload: queryResult,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
+  }
+});
 
-//delete activity by Id
-router.delete("/:activityId", async (req, res) => {});
+//get all staffs by activityId
+router.get("/:activityId/staffs", async (req, res) => {
+  try {
+    const queryResult = await pool.query(
+      "SELECT * FROM activity_staff WHERE activityId=?",
+      parseInt(req.params.activityId)
+    );
+    res.json({
+      requestedTime: Date.now(),
+      requestedBy: req.authData.sub,
+      payload: queryResult,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
+  }
+});
 
-//get staffs by Id
-router.get("/:activityId/staffs", async (req, res) => {});
-
-//edit staffs by Id
-router.put("/:activityId/staffs/:studentId", async (req, res) => {});
-
-//delete staffs by Id
-router.delete("/:activityId/staffs/:studentId", async (req, res) => {});
+//delete staffs by activityId
+router.delete("/:activityId/staffs/:studentId", async (req, res) => {
+  try {
+    const queryResult = await pool.query(
+      "DELETE FROM activity_staff\
+              WHERE activityId=? AND studentId=?",
+      [parseInt(req.params.activityId), parseInt(req.params.studentId)]
+    );
+    res.status(201).json({
+      status: `Delete activityId:${req.params.activityId} successful`,
+      payload: queryResult,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
+  }
+});
 
 module.exports = router;
