@@ -16,6 +16,8 @@ const staffs = require("./modules/staffs");
 
 const scholarships = require("./modules/scholarships");
 
+const activities = require("./modules/activities");
+
 const login = require("./modules/login");
 
 const setPassword = require("./modules/setPassword");
@@ -38,6 +40,8 @@ app.use("/api/staffs", staffs);
 
 app.use("/api/scholarships", scholarships);
 
+app.use("/api/activities", activities);
+
 app.use("/login", login);
 
 app.use("/set-password", setPassword);
@@ -47,9 +51,10 @@ app.get("/", (req, res) =>
 );
 
 app.get("/api", authorization, (req, res) =>
-  res.json({ api: "MHEENOI BACKEND", version: 0.2, authData: req.authData })
+  res.json({ api: "MHEENOI BACKEND", version: 0.3, authData: req.authData })
 );
 
+//Test functions
 app.post("/hashing", async (req, res) => {
   const rawPassword = req.body.payload.password;
   try {
