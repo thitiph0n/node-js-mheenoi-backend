@@ -81,7 +81,7 @@ router.post("/", hasRole([3]), async (req, res) => {
 });
 
 //get student information by authData
-router.get("/info", async (req, res) => {
+router.get("/info", hasRole([1]), async (req, res) => {
   try {
     const queryResult = await pool.query(
       "SELECT * FROM student_info WHERE studentId=?",
@@ -119,7 +119,7 @@ router.get("/:studentId/info", async (req, res) => {
 });
 
 //update student information by studentId
-router.put("/:studentId/info", async (req, res) => {
+router.put("/:studentId/info", hasRole([1]), async (req, res) => {
   const payload = req.body.payload;
   try {
     //update to database
@@ -163,7 +163,7 @@ router.put("/:studentId/info", async (req, res) => {
   }
 });
 
-router.get("/dashboard", async (req, res) => {
+router.get("/dashboard", hasRole([1]), async (req, res) => {
   try {
     const queryResult1 = await pool.query(
       "SELECT * FROM student_info WHERE studentId=?",
@@ -178,8 +178,8 @@ router.get("/dashboard", async (req, res) => {
       from enrollment\
       join enrollmentdetail on enrollment.enrollmentId = enrollmentdetail.enrollmentId\
       join subject on enrollmentdetail.subjectId=subject.subjectId\
-      join sectionlecturer on enrollmentdetail.sectionId=sectionlecturer.sectionId and enrollmentdetail.subjectId=sectionlecturer.subjectId\
-      join employee on employee.employeeId=sectionlecturer.lecturerId\
+      join section_lecturer on enrollmentdetail.sectionId=section_lecturer.sectionId and enrollmentdetail.subjectId=section_lecturer.subjectId\
+      join employee on employee.employeeId=section_lecturer.lecturerId\
       where studentId = ? and year = ? and semester = ?",
       [req.authData.sub, globalConst.academicYear, globalConst.semester]
     );
@@ -208,7 +208,7 @@ router.get("/dashboard", async (req, res) => {
   }
 });
 
-router.get("/scholarship", async (req, res) => {
+router.get("/scholarship", hasRole([1]), async (req, res) => {
   try {
     const queryResult = await pool.query(
       "SELECT * FROM student_scholarship WHERE studentId=? ",

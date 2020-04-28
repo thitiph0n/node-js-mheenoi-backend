@@ -9,7 +9,7 @@ router.use(authorization);
 //get all employees list
 router.get("/", hasRole([3]), async (req, res) => {
   try {
-    const queryResult = await pool.query("SELECT * FROM employee");
+    const queryResult = await pool.query("SELECT * FROM employee_info");
     res.json({ payload: queryResult });
   } catch (error) {
     res
@@ -53,6 +53,56 @@ router.post("/", hasRole([3]), async (req, res) => {
       defaultPassword,
     ]);
     res.status(201).json({ message: "register successful" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
+  }
+});
+
+//get employee information by employeeId
+router.get("/:employeeId/info", async (req, res) => {
+  try {
+    const queryResult = await pool.query(
+      "SELECT * FROM employee_info WHERE employeeId=?",
+      req.params.employeeId
+    );
+    res.json({
+      requestedTime: Date.now(),
+      requestedBy: req.authData.sub,
+      payload: queryResult,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
+  }
+});
+
+//update employee information by employeeId
+router.put("/:employeeId/info", async (req, res) => {
+  const payload = req.body.payload;
+  try {
+    //update to database
+    const sql =
+      " UPDATE employee SET title=?, gender=?, firstName=?, \
+      lastName=?, idCardNumber=? , email=?, dob=?, phoneNo = ?, bloodType=?,\
+      address=?,\
+      WHERE employeeId = ?";
+    await pool.query(sql, [
+      payload.title,
+      payload.gender,
+      payload.firstName,
+      payload.lastName,
+      payload.idCardNumber,
+      payload.email,
+      payload.dob,
+      payload.phoneNo,
+      payload.bloodType,
+      payload.address,
+      req.params.employeeId,
+    ]);
+    res.status(201).json({ message: "Update successful" });
   } catch (error) {
     res
       .status(500)

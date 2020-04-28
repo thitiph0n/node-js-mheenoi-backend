@@ -11,7 +11,7 @@ router.use(authorization);
 //list all scholarships
 router.get("/", async (req, res) => {
   try {
-    const queryResult = await pool.query("SELECT * FROM scholarshiplist");
+    const queryResult = await pool.query("SELECT * FROM scholarship_list");
     res.json({
       requestedTime: Date.now(),
       requestedBy: req.authData.sub,
@@ -29,7 +29,7 @@ router.post("/", hasRole([3]), async (req, res) => {
   const payload = req.body.payload;
   try {
     const queryResult = await pool.query(
-      "INSERT INTO scholarshiplist(scholarshipName,donator,details) VALUE(?,?,?)",
+      "INSERT INTO scholarship_list(scholarshipName,donator,details) VALUE(?,?,?)",
       [payload.scholarshipName, payload.donator, payload.details]
     );
     res.status(201).json({
@@ -47,7 +47,9 @@ router.post("/", hasRole([3]), async (req, res) => {
 //list all requests
 router.get("/requests", hasRole([3]), async (req, res) => {
   try {
-    const queryResult = await pool.query("SELECT * FROM scholarshiprequest");
+    const queryResult = await pool.query(
+      "SELECT * FROM scholarship_request_info"
+    );
     res.json({
       requestedTime: Date.now(),
       requestedBy: req.authData.sub,
@@ -60,29 +62,43 @@ router.get("/requests", hasRole([3]), async (req, res) => {
   }
 });
 
-router.post("/requests", hasRole([1, 3]), async (req, res) => {
+router.post("/requests", hasRole([1]), async (req, res) => {
   const payload = req.body.payload;
   try {
     const queryResult = await pool.query(
-      "INSERT INTO scholarshiprequest \
-        (studentId,scholarshipId,reasonOfRequest,pastActivity,yearOfRequest)\
-        VALUE(?,?,?,?,?)",
+      "INSERT INTO scholarship_request \
+        (studentId,scholarshipId,reasonOfRequest,yearOfRequest)\
+        VALUE(?,?,?,?)",
       [
         payload.studentId,
         payload.scholarshipId,
         payload.reasonOfRequest,
-        payload.pastActivity,
         globalConst.academicYear,
       ]
     );
+    let values = "";
+    //loop all activities in array
+    const activities = payload.activities;
+    for (activity in activities) {
+      values += `("${payload.studentId}",${payload.scholarshipId},${activities[activity].index},"${activities[activity].name}","${activities[activity].type}"),`;
+    }
+    values = values.slice(0, values.length - 1);
+    const queryResult2 = await pool.query(
+      `INSERT INTO scholarship_request_activity\
+        (studentId,scholarshipId,no,activityName,activityType)\
+        VALUE ${values}`
+    );
     res.status(201).json({
       status: "request successful",
-      payload: queryResult,
+      payload: queryResult2,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: { message: error.sqlMessage, code: error.code } });
+    res.status(500).json({
+      error: {
+        message: error.sqlMessage || "unknown error",
+        code: error.code,
+      },
+    });
   }
 });
 
@@ -91,7 +107,7 @@ router.put("/requests/status", hasRole([3]), async (req, res) => {
   const payload = req.body.payload;
   try {
     const queryResult = await pool.query(
-      "UPDATE scholarshiprequest SET status = ?\
+      "UPDATE scholarship_request SET status = ?\
       WHERE studentId=? and scholarshipId=?",
       [payload.status, payload.studentId, payload.scholarshipId]
     );
@@ -110,7 +126,7 @@ router.put("/requests/status", hasRole([3]), async (req, res) => {
 router.get("/:scholarshipId", async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "SELECT * FROM scholarshiprequest\
+      "SELECT * FROM scholarship_request\
         WHERE scholarshipId=?",
       req.params.scholarshipId
     );
@@ -130,7 +146,7 @@ router.get("/:scholarshipId", async (req, res) => {
 router.delete("/:scholarshipId", hasRole([3]), async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "DELETE FROM scholarshiplist\
+      "DELETE FROM scholarship_list\
       WHERE scholarshipId=?",
       [parseInt(req.params.scholarshipId)]
     );

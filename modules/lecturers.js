@@ -12,7 +12,7 @@ router.use(authorization);
 router.get("/", hasRole([2, 3]), async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "SELECT * FROM employee WHERE position = Lecturer"
+      "SELECT * FROM employee_info WHERE position = Lecturer"
     );
     res.json({
       requestedTime: Date.now(),
@@ -25,14 +25,5 @@ router.get("/", hasRole([2, 3]), async (req, res) => {
       .json({ error: { message: error.sqlMessage, code: error.code } });
   }
 });
-
-//register employee
-router.post("/", (req, res) => {});
-
-//get employee information by employeeId
-router.get("/:employeeId/info", (req, res) => {});
-
-//update employee information by employeeId
-router.put("/:employeeId/info", (req, res) => {});
 
 module.exports = router;
