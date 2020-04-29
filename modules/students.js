@@ -174,14 +174,14 @@ router.get("/dashboard", hasRole([1]), async (req, res) => {
       [req.authData.sub, "approve", globalConst.academicYear]
     );
     const queryResult3 = await pool.query(
-      "select enrollmentdetail.subjectId,subject.subjectName,enrollmentdetail.sectionId,employee.firstName,employee.lastName\
+      "select enrollment.year,enrollment.semester,enrollmentdetail.grade,enrollmentdetail.subjectId,subject.subjectName,enrollmentdetail.sectionId,employee.firstName,employee.lastName\
       from enrollment\
       join enrollmentdetail on enrollment.enrollmentId = enrollmentdetail.enrollmentId\
       join subject on enrollmentdetail.subjectId=subject.subjectId\
       join section_lecturer on enrollmentdetail.sectionId=section_lecturer.sectionId and enrollmentdetail.subjectId=section_lecturer.subjectId\
       join employee on employee.employeeId=section_lecturer.lecturerId\
-      where studentId = ? and year = ? and semester = ?",
-      [req.authData.sub, globalConst.academicYear, globalConst.semester]
+      where studentId = ? ",
+      [req.authData.sub]
     );
     const queryResult4 = await pool.query(
       "select (sum( enrollmentdetail.grade * subject.credit) /\
