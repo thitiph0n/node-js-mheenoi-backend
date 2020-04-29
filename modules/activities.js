@@ -45,7 +45,6 @@ router.post("/", hasRole([1]), async (req, res) => {
     let values = "";
     //loop all staffs in array
     const staffs = payload.staffs;
-    console.log(staffs);
     for (staff in staffs) {
       values += `(${queryResult.insertId},"${staffs[staff].studentId}","${staffs[staff].duty}"),`;
     }
@@ -61,23 +60,24 @@ router.post("/", hasRole([1]), async (req, res) => {
       payload: [queryResult, queryResult2],
     });
   } catch (error) {
+    if (queryResult) {
+      try {
+        await pool.query(
+          "DELETE FROM activity\
+            WHERE activityId=?",
+          [queryResult.insertId]
+        );
+        console.log("Roll back complete");
+      } catch (error) {
+        console.log(error);
+      }
+    }
     res.status(500).json({
       error: {
         message: error.sqlMessage || error,
         code: error.code,
       },
     });
-  }
-  if (queryResult) {
-    try {
-      await pool.query("DELETE FROM activity\
-          WHERE activityId=?", [
-        queryResult.insertId,
-      ]);
-      console.log("Roll back complete");
-    } catch (error) {
-      console.log(error);
-    }
   }
 });
 
