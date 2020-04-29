@@ -110,7 +110,8 @@ router.delete("/:activityId", async (req, res) => {
 router.get("/:activityId/staffs", async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "SELECT * FROM activity_staff WHERE activityId=?",
+      "SELECT a.studentId,s.firstName,s.lastName,a.duty FROM activity_staff a\
+      LEFT JOIN student s ON s.studentId = a.studentId WHERE activityId=?",
       parseInt(req.params.activityId)
     );
     res.json({

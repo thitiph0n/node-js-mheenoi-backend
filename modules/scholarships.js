@@ -47,7 +47,9 @@ router.post("/", hasRole([3]), async (req, res) => {
 //list all requests
 router.get("/requests", hasRole([3]), async (req, res) => {
   try {
-    const queryResult = await pool.query("SELECT * FROM scholarship_request");
+    const queryResult = await pool.query(
+      "SELECT * FROM scholarship_request_info"
+    );
     res.json({
       requestedTime: Date.now(),
       requestedBy: req.authData.sub,
