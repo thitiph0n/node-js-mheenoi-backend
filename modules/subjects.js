@@ -5,10 +5,20 @@ const authorization = require("../helpers/authorization");
 const globalConst = require("../helpers/constants");
 const hasRole = require("../helpers/hasRole");
 
-//add new subject
+/****add new subject****/
+//insert subject
+//insert section
+//insert section_lecturer
+//insert section_time
 
-//list all subject
+/****list all subjects****/
 
-//get subject info by subjectId
+/****list subjects by employeeId(lecturer)****/
+
+/****get subject info by subjectId****/
+
+/****get sections by subjectId****/
+
+/****get section detail by subjectId and section****/
 
 module.exports = router;
