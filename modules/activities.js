@@ -28,8 +28,9 @@ router.get("/", async (req, res) => {
 router.post("/", hasRole([1]), async (req, res) => {
   //insert activity
   const payload = req.body.payload;
+  let queryResult;
   try {
-    const queryResult = await pool.query(
+    queryResult = await pool.query(
       "INSERT INTO activity \
         (name, startTime, endTime, detail, location)\
         VALUE(?,?,?,?,?)",
@@ -44,6 +45,7 @@ router.post("/", hasRole([1]), async (req, res) => {
     let values = "";
     //loop all staffs in array
     const staffs = payload.staffs;
+    console.log(staffs);
     for (staff in staffs) {
       values += `(${queryResult.insertId},"${staffs[staff].studentId}","${staffs[staff].duty}"),`;
     }
@@ -56,15 +58,26 @@ router.post("/", hasRole([1]), async (req, res) => {
     );
     res.status(201).json({
       status: "request successful",
-      payload: [queryResult1, queryResult2],
+      payload: [queryResult, queryResult2],
     });
   } catch (error) {
     res.status(500).json({
       error: {
-        message: error.sqlMessage || "unknown error",
+        message: error.sqlMessage || error,
         code: error.code,
       },
     });
+  }
+  if (queryResult) {
+    try {
+      await pool.query("DELETE FROM activity\
+          WHERE activityId=?", [
+        queryResult.insertId,
+      ]);
+      console.log("Roll back complete");
+    } catch (error) {
+      console.log(error);
+    }
   }
 });
 

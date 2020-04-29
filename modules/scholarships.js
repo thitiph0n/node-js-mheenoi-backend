@@ -91,7 +91,7 @@ router.post("/requests", hasRole([1]), async (req, res) => {
     );
     res.status(201).json({
       status: "request successful",
-      payload: queryResult2,
+      payload: [queryResult, queryResult2],
     });
   } catch (error) {
     res.status(500).json({
