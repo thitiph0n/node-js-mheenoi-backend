@@ -3,7 +3,6 @@ const router = express.Router();
 const pool = require("../helpers/database");
 const authorization = require("../helpers/authorization");
 const hasRole = require("../helpers/hasRole");
-const globalConst = require("../helpers/constants");
 
 //authorize before access
 router.use(authorization);
