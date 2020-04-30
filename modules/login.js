@@ -40,7 +40,7 @@ router.post("/", async (req, res) => {
       res.json({ jwt: webToken, type: req.body.userId[0] });
     } else {
       if (rawPassword === queryResult[0].password) {
-        res.status(400).json({
+        res.status(426).json({
           error: { message: "Using not secure password", errorCode: 200 },
         });
       } else {
