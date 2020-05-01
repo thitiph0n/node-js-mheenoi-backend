@@ -22,6 +22,8 @@ const activities = require("./modules/activities");
 
 const subjects = require("./modules/subjects");
 
+const analysis = require("./modules/analysis");
+
 const login = require("./modules/login");
 
 const setPassword = require("./modules/setPassword");
@@ -48,6 +50,8 @@ app.use("/api/scholarships", scholarships);
 app.use("/api/activities", activities);
 
 app.use("/api/subjects", subjects);
+
+app.use("/api/analysis", analysis);
 
 app.use("/login", login);
 
