@@ -3,6 +3,7 @@ const router = express.Router();
 const pool = require("../helpers/database");
 const authorization = require("../helpers/authorization");
 const hasRole = require("../helpers/hasRole");
+const convertToDateTime = require("../tools/convertTime");
 
 //authorize before access
 router.use(authorization);
@@ -27,7 +28,12 @@ router.post("/", hasRole([2, 3]), async (req, res) => {
     }
     const times = sections[section].class;
     for (time in times) {
-      timeValues += `("${payload.subjectId}",${sections[section].sectionId},${times[time].no},"${times[time].startTime}","${times[time].endTime}"),`;
+      timeValues += `("${payload.subjectId}",${sections[section].sectionId},${
+        times[time].no
+      },"${convertToDateTime(
+        times[time].weekday,
+        times[time].startTime
+      )}","${convertToDateTime(times[time].weekday, times[time].endTime)}"),`;
     }
   }
   //remove , at the last value

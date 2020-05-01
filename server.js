@@ -79,24 +79,5 @@ app.post("/hashing", async (req, res) => {
   }
 });
 
-app.post("/testing/id", async (req, res) => {
-  const payload = req.body.payload;
-  console.log(payload);
-  try {
-    const studentId = await generateId({
-      role: 2,
-      academicYear: 2020,
-      program: payload.program,
-      departmentId: payload.departmentId,
-      position: payload.position,
-    });
-    res.json({ studentId: studentId });
-  } catch (error) {
-    console.log(error);
-
-    res.sendStatus(500);
-  }
-});
-
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Running on port ${PORT}`));
