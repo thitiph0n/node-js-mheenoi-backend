@@ -49,7 +49,7 @@ router.post("/", hasRole([3]), async (req, res) => {
       payload.phoneNo,
       payload.address,
       payload.position,
-      `/profile/${payload.position.toLowerCase()}.jpg`,
+      `/profile/${payload.position.toLowerCase()}.png`,
       defaultPassword,
     ]);
     res.status(201).json({ message: "register successful" });
@@ -80,7 +80,7 @@ router.get("/:employeeId/info", async (req, res) => {
 });
 
 //update employee information by employeeId
-router.put("/:employeeId/info", async (req, res) => {
+router.put("/:employeeId/info", hasRole([2, 3]), async (req, res) => {
   const payload = req.body.payload;
   try {
     //update to database

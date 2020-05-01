@@ -12,9 +12,10 @@ router.use(authorization);
 router.get("/student-in-dep", hasRole([2, 3]), async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "SELECT depCode,faculty,count(*) AS count\
-    FROM student s, department d\
-    WHERE d.departmentId = s.departmentId"
+      "select d.departmentId,d.depCode,d.depName,d.faculty,count(s.studentId) AS students\
+      from department d\
+      left join student s on d.departmentId = s.departmentId\
+      group by d.departmentId"
     );
     res.json({ payload: queryResult });
   } catch (error) {
@@ -28,10 +29,12 @@ router.get("/student-in-dep", hasRole([2, 3]), async (req, res) => {
 router.get("/student-in-subject", hasRole([2, 3]), async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "select s.subjectId,s.subjectName,count(*)AS count \
-    from enrollment e, subject s,enrollmentdetail b\
-    where b.enrollmentId = e.enrollmentId and s.subjectId= b.subjectId\
-    group by b.subjectId,e.year having year = ?",
+      "select subject.subjectId,subject.subjectName,count(year) AS students\
+      from subject join section on subject.subjectId = section.subjectId\
+      left join enrollmentdetail on section.subjectId = enrollmentdetail.subjectId and section.sectionId = enrollmentdetail.sectionId\
+      left join enrollment on enrollment.enrollmentId = enrollmentdetail.enrollmentId\
+      where year=? or year is null\
+      group by subject.subjectId",
       globalConst.academicYear
     );
     res.json({ payload: queryResult });
@@ -46,10 +49,14 @@ router.get("/student-in-subject", hasRole([2, 3]), async (req, res) => {
 router.get("/scholarship", hasRole([2, 3]), async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "select scholarshipName,count(*) as count\
-    from scholarship_list sl,scholarship_request sr\
-    where sl.scholarshipId = sr.scholarshipId and yearOfRequest = ?\
-    group by scholarshipName;"
+      "select l.scholarshipId,l.scholarshipName,\
+      case when yearOfRequest = 2020 then count(yearOfRequest)\
+      else 0\
+      end\
+      as numberOfRequests\
+      from scholarship_list l\
+      left join scholarship_request r on r.scholarshipId =l.scholarshipId\
+      group by scholarshipId,yearOfRequest"
     );
     res.json({ payload: queryResult });
   } catch (error) {
