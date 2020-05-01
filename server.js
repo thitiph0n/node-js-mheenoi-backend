@@ -6,8 +6,6 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 
 //import modules
-const generateId = require("./tools/generateId");
-
 const students = require("./modules/students");
 
 const employees = require("./modules/employees");

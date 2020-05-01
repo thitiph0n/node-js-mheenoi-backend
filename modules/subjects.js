@@ -151,6 +151,18 @@ router.get("/:employeeId", hasRole([2, 3]), async (req, res) => {
   }
 });
 
+/****list all students in subject****/
+router.get("/:subjectId/students", hasRole([2, 3]), async (req, res) => {
+  try {
+    const queryResult = await pool.query("SELECT * FROM subject");
+    res.json({ payload: queryResult });
+  } catch (error) {
+    res.status(500).json({
+      error: { message: error.sqlMessage || error, code: error.code },
+    });
+  }
+});
+
 /****get subject info by subjectId****/
 
 /****get sections by subjectId****/

@@ -29,7 +29,7 @@ router.get("/student-in-dep", hasRole([2, 3]), async (req, res) => {
 router.get("/student-in-subject", hasRole([2, 3]), async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "select subject.subjectId,subject.subjectName,count(year) AS students\
+      "select subject.subjectId,subject.subjectName,count(year) AS numberOfStudents\
       from subject join section on subject.subjectId = section.subjectId\
       left join enrollmentdetail on section.subjectId = enrollmentdetail.subjectId and section.sectionId = enrollmentdetail.sectionId\
       left join enrollment on enrollment.enrollmentId = enrollmentdetail.enrollmentId\
@@ -69,7 +69,12 @@ router.get("/scholarship", hasRole([2, 3]), async (req, res) => {
 /**Summary of employees in each department**/
 router.get("/employee-in-dep", hasRole([2, 3]), async (req, res) => {
   try {
-    const queryResult = await pool.query("SELECT * FROM student_in_dep");
+    const queryResult = await pool.query(
+      "select d.departmentId,d.depCode,d.depName,d.faculty,count(e.employeeId) AS numberOfEmployees\
+    from department d\
+    left join employee e on d.departmentId = e.departmentId\
+    group by d.departmentId"
+    );
     res.json({ payload: queryResult });
   } catch (error) {
     res.status(500).json({
