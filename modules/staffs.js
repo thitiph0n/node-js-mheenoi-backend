@@ -11,7 +11,7 @@ router.use(authorization);
 router.get("/", hasRole([2, 3]), async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "SELECT * FROM employee_info WHERE position = Staff"
+      'SELECT * FROM employee_info WHERE position = "Staff"'
     );
     res.json({
       requestedTime: Date.now(),
