@@ -85,9 +85,9 @@ router.put("/:employeeId/info", hasRole([2, 3]), async (req, res) => {
   try {
     //update to database
     const sql =
-      " UPDATE employee SET title=?, gender=?, firstName=?, \
+      " UPDATE employee SET title=?, gender=?, firstName=?,\
       lastName=?, idCardNumber=? , email=?, dob=?, phoneNo = ?, bloodType=?,\
-      address=?,\
+      address=?\
       WHERE employeeId = ?";
     await pool.query(sql, [
       payload.title,
@@ -104,9 +104,11 @@ router.put("/:employeeId/info", hasRole([2, 3]), async (req, res) => {
     ]);
     res.status(201).json({ message: "Update successful" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: { message: error.sqlMessage, code: error.code } });
+    console.log(error);
+
+    res.status(500).json({
+      error: { message: error.sqlMessage || error, code: error.code },
+    });
   }
 });
 
