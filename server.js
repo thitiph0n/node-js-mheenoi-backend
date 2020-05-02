@@ -24,6 +24,8 @@ const analysis = require("./modules/analysis");
 
 const enrollments = require("./modules/enrollments");
 
+const grades = require("./modules/grades");
+
 const login = require("./modules/login");
 
 const setPassword = require("./modules/setPassword");
@@ -52,6 +54,8 @@ app.use("/api/activities", activities);
 app.use("/api/subjects", subjects);
 
 app.use("/api/analysis", analysis);
+
+app.use("/api/grades", grades);
 
 app.use("/api/enrollments", enrollments);
 

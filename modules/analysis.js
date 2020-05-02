@@ -12,7 +12,7 @@ router.use(authorization);
 router.get("/student-in-dep", hasRole([2, 3]), async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "select d.departmentId,d.depCode,d.depName,d.faculty,count(s.studentId) AS students\
+      "select d.departmentId,d.depCode,d.depName,d.faculty,count(s.studentId) AS numberOfStudents\
       from department d\
       left join student s on d.departmentId = s.departmentId\
       group by d.departmentId"
