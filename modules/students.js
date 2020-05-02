@@ -11,7 +11,7 @@ router.use(authorization);
 //get all students list
 router.get("/", hasRole([2, 3]), async (req, res) => {
   try {
-    const queryResult = await pool.query("SELECT * FROM student");
+    const queryResult = await pool.query("SELECT * FROM student_info");
     res.json({ payload: queryResult });
   } catch (error) {
     res
