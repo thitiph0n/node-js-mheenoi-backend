@@ -9,11 +9,14 @@ const hasRole = require("../helpers/hasRole");
 router.use(authorization);
 
 //get grade by subject and section
-router.get("/", hasRole([2]), async (req, res) => {
+router.get("/:subjectId", hasRole([2]), async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "SELECT e.studentId, ed.subjectId, ed.sectionId, ed.grade FROM enrollment e\
-    LEFT JOIN enrollmentdetail ed ON e.enrollmentId = ed.enrollmentId"
+      'SELECT e.studentId,CONCAT(s.firstName," ",s.lastName)AS fullName, ed.subjectId, ed.sectionId, ed.grade FROM enrollment e\
+    LEFT JOIN enrollmentdetail ed ON e.enrollmentId = ed.enrollmentId\
+    JOIN student s ON e.studentId = s.studentId\
+    WHERE ed.subjectId = ? AND e.year=? AND e.semester=?',
+      [req.params.subjectId, globalConst.academicYear, globalConst.semester]
     );
     res.json({ payload: queryResult });
   } catch (error) {
@@ -27,25 +30,15 @@ router.get("/", hasRole([2]), async (req, res) => {
 router.put("/", hasRole([2]), async (req, res) => {
   const payload = req.body.payload;
   try {
+    let values = "";
+    //loop all student in array
+    for (i in payload) {
+      values += `(${payload[i].enrollmentId},"${payload[i].subjectId}",${payload[i].grade}),`;
+    }
+    values = values.slice(0, values.length - 1);
     //update to database
-    const sql =
-      " UPDATE employee SET title=?, gender=?, firstName=?, \
-        lastName=?, idCardNumber=? , email=?, dob=?, phoneNo = ?, bloodType=?,\
-        address=?,\
-        WHERE employeeId = ?";
-    await pool.query(sql, [
-      payload.title,
-      payload.gender,
-      payload.firstName,
-      payload.lastName,
-      payload.idCardNumber,
-      payload.email,
-      payload.dob,
-      payload.phoneNo,
-      payload.bloodType,
-      payload.address,
-      req.params.employeeId,
-    ]);
+    await pool.query(`INSERT INTO enrollmentdetail(enrollmentId,subjectId,grade)\
+    VALUES ${values} ON DUPLICATE KEY UPDATE grade=VALUES(grade);`);
     res.status(201).json({ message: "Update successful" });
   } catch (error) {
     res
