@@ -40,7 +40,8 @@ router.post("/", hasRole([3]), async (req, res) => {
                 picturePath, email, dob, phoneNo, bloodType, address, password,\
                 parent1FirstName, parent1LastName, parent1Tel, parent1Career, \
                 parent1Income, parent1Relation, parent2FirstName, parent2LastName, \
-                parent2Tel, parent2Career, parent2Income, parent2Relation)";
+                parent2Tel, parent2Career, parent2Income, parent2Relation)\
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     await pool.query(sql, [
       studentId,
       payload.title,
@@ -51,7 +52,7 @@ router.post("/", hasRole([3]), async (req, res) => {
       payload.degree,
       payload.departmentId,
       payload.program,
-      payload.year,
+      globalConst.academicYear,
       "/profile/student.jpg",
       payload.email,
       payload.dob,
