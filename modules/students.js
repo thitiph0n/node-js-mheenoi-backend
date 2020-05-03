@@ -119,7 +119,7 @@ router.get("/:studentId/info", async (req, res) => {
 });
 
 //update student information by studentId
-router.put("/:studentId/info", hasRole([1]), async (req, res) => {
+router.put("/:studentId/info", hasRole([1, 3]), async (req, res) => {
   const payload = req.body.payload;
   try {
     //update to database
