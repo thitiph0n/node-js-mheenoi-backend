@@ -52,7 +52,7 @@ router.post("/", hasRole([3]), async (req, res) => {
       payload.degree,
       payload.departmentId,
       payload.program,
-      globalConst.academicYear,
+      payload.year,
       "/profile/student.jpg",
       payload.email,
       payload.dob,
