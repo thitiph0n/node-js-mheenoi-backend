@@ -163,4 +163,22 @@ router.delete("/:scholarshipId", hasRole([3]), async (req, res) => {
   }
 });
 
+router.get("/:scholarshipId/delete", hasRole([3]), async (req, res) => {
+  try {
+    const queryResult = await pool.query(
+      "DELETE FROM scholarship_list\
+      WHERE scholarshipId=?",
+      [parseInt(req.params.scholarshipId)]
+    );
+    res.status(201).json({
+      status: `Delete scholarshipId:${req.params.scholarshipId} successful`,
+      payload: queryResult,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
+  }
+});
+
 module.exports = router;

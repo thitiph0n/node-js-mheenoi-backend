@@ -118,6 +118,24 @@ router.delete("/:activityId", async (req, res) => {
   }
 });
 
+router.get("/:activityId/delete", async (req, res) => {
+  try {
+    const queryResult = await pool.query(
+      "DELETE FROM activity\
+          WHERE activityId=?",
+      [parseInt(req.params.activityId)]
+    );
+    res.status(201).json({
+      status: `Delete activityId:${req.params.activityId} successful`,
+      payload: queryResult,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
+  }
+});
+
 //get all staffs by activityId
 router.get("/:activityId/staffs", async (req, res) => {
   try {
@@ -140,6 +158,24 @@ router.get("/:activityId/staffs", async (req, res) => {
 
 //delete staffs by activityId
 router.delete("/:activityId/staffs/:studentId", async (req, res) => {
+  try {
+    const queryResult = await pool.query(
+      "DELETE FROM activity_staff\
+              WHERE activityId=? AND studentId=?",
+      [parseInt(req.params.activityId), parseInt(req.params.studentId)]
+    );
+    res.status(201).json({
+      status: `Delete activityId:${req.params.activityId} successful`,
+      payload: queryResult,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: { message: error.sqlMessage, code: error.code } });
+  }
+});
+
+router.get("/:activityId/staffs/:studentId/delete", async (req, res) => {
   try {
     const queryResult = await pool.query(
       "DELETE FROM activity_staff\
