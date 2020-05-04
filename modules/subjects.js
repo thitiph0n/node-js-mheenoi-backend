@@ -4,6 +4,7 @@ const pool = require("../helpers/database");
 const authorization = require("../helpers/authorization");
 const hasRole = require("../helpers/hasRole");
 const convertToDateTime = require("../tools/convertTime");
+const globalConst = require("../helpers/constants");
 
 //authorize before access
 router.use(authorization);
@@ -142,7 +143,11 @@ router.get("/", hasRole([2, 3]), async (req, res) => {
 /****list subjects by employeeId(lecturer)****/
 router.get("/:employeeId", hasRole([2, 3]), async (req, res) => {
   try {
-    const queryResult = await pool.query("SELECT * FROM subject");
+    const queryResult = await pool.query(
+      "SELECT DISTINCT subjectId,subjectName,description,credit\
+     FROM subject_all_join WHERE lecturerId=?",
+      req.params.employeeId
+    );
     res.json({ payload: queryResult });
   } catch (error) {
     res.status(500).json({
@@ -154,7 +159,14 @@ router.get("/:employeeId", hasRole([2, 3]), async (req, res) => {
 /****list all students in subject****/
 router.get("/:subjectId/students", hasRole([2, 3]), async (req, res) => {
   try {
-    const queryResult = await pool.query("SELECT * FROM subject");
+    const queryResult = await pool.query(
+      "select subject.subjectId,subject.subjectName,enrollment.studentId,enrollmentdetail.sectionId\
+    from subject join section on subject.subjectId = section.subjectId\
+    left join enrollmentdetail on section.subjectId = enrollmentdetail.subjectId and section.sectionId = enrollmentdetail.sectionId\
+    join enrollment on enrollment.enrollmentId = enrollmentdetail.enrollmentId\
+    where subject.subjectId = ? and enrollment.year = ? and enrollment.semester = ?",
+      [req.params.subjectId, globalConst.academicYear, globalConst.semester]
+    );
     res.json({ payload: queryResult });
   } catch (error) {
     res.status(500).json({
@@ -163,10 +175,19 @@ router.get("/:subjectId/students", hasRole([2, 3]), async (req, res) => {
   }
 });
 
-/****get subject info by subjectId****/
-
-/****get sections by subjectId****/
-
-/****get section detail by subjectId and section****/
+/****get subject info and section by subjectId****/
+router.get("/:subjectId/details", hasRole([2, 3]), async (req, res) => {
+  try {
+    const queryResult = await pool.query(
+      "SELECT * FROM subject_all_join WHERE subjectId=?",
+      req.params.subjectId
+    );
+    res.json({ payload: queryResult });
+  } catch (error) {
+    res.status(500).json({
+      error: { message: error.sqlMessage || error, code: error.code },
+    });
+  }
+});
 
 module.exports = router;
