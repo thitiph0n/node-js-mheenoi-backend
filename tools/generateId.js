@@ -50,7 +50,7 @@ async function generateId(info) {
         //running number
         const queryResult = await pool.query(`SELECT count(employeeId) as count \
                                             FROM employee WHERE employeeId like "${id}%"`);
-        id += zeroFill(queryResult[0].count + 1, 3);
+        id += zeroFill(queryResult[0].count + 1, 4);
 
         return id;
       } catch (error) {

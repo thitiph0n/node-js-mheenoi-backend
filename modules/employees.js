@@ -3,6 +3,7 @@ const router = express.Router();
 const pool = require("../helpers/database");
 const authorization = require("../helpers/authorization");
 const hasRole = require("../helpers/hasRole");
+const generateId = require("../tools/generateId");
 
 router.use(authorization);
 
@@ -28,13 +29,14 @@ router.post("/", hasRole([3]), async (req, res) => {
       position: payload.position,
       departmentId: payload.departmentId,
     });
+    console.log(employeeId);
     //set default password
     const defaultPassword = payload.dob.toString();
     //insert to database
     const sql =
-      "INSERT INTO student(employeeId, idCardNumber, title, firstName, lastName,\
+      "INSERT INTO employee(employeeId, idCardNumber, title, firstName, lastName,\
       departmentId, dob, gender, bloodType, email, phoneNo, address, position, \
-      picturePath, password) VALUE()";
+      picturePath, password) VALUE(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     await pool.query(sql, [
       employeeId,
       payload.idCardNumber,
@@ -54,9 +56,9 @@ router.post("/", hasRole([3]), async (req, res) => {
     ]);
     res.status(201).json({ message: "register successful" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: { message: error.sqlMessage, code: error.code } });
+    res.status(500).json({
+      error: { message: error.sqlMessage || error, code: error.code },
+    });
   }
 });
 
