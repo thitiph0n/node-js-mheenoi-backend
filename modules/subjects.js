@@ -160,11 +160,12 @@ router.get("/:employeeId", hasRole([2, 3]), async (req, res) => {
 router.get("/:subjectId/students", hasRole([2, 3]), async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "select subject.subjectId,subject.subjectName,enrollment.studentId,enrollmentdetail.sectionId\
+      'select subject.subjectId,subject.subjectName,enrollment.studentId,CONCAT(student.firstName," ",student.lastName)AS fullName,enrollmentdetail.sectionId\
     from subject join section on subject.subjectId = section.subjectId\
     left join enrollmentdetail on section.subjectId = enrollmentdetail.subjectId and section.sectionId = enrollmentdetail.sectionId\
     join enrollment on enrollment.enrollmentId = enrollmentdetail.enrollmentId\
-    where subject.subjectId = ? and enrollment.year = ? and enrollment.semester = ?",
+    join student on student.studentId = enrollment.studentId\
+    where subject.subjectId = ? and enrollment.year = ? and enrollment.semester = ?',
       [req.params.subjectId, globalConst.academicYear, globalConst.semester]
     );
     res.json({ payload: queryResult });

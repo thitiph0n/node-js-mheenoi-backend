@@ -15,7 +15,9 @@ router.get("/", hasRole([3]), async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ error: { message: error.sqlMessage, code: error.code } });
+      .json({
+        error: { message: error.sqlMessage || error, code: error.code },
+      });
   }
 });
 
