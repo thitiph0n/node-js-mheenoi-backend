@@ -30,7 +30,7 @@ router.get("/:subjectId", hasRole([2]), async (req, res) => {
 router.get("/:subjectId/:sectionId", hasRole([2]), async (req, res) => {
   try {
     const queryResult = await pool.query(
-      'SELECT e.studentId,CONCAT(s.firstName," ",s.lastName)AS fullName, ed.subjectId, ed.sectionId, ed.grade FROM enrollment e\
+      'SELECT e.studentId,CONCAT(s.firstName," ",s.lastName)AS fullName, ed.subjectId, ed.sectionId, ed.grade,ed.enrollmentId FROM enrollment e\
     LEFT JOIN enrollmentdetail ed ON e.enrollmentId = ed.enrollmentId\
     JOIN student s ON e.studentId = s.studentId\
     WHERE ed.subjectId = ? AND ed.sectionId = ? AND e.year=? AND e.semester=?',
