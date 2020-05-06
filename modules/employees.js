@@ -13,11 +13,25 @@ router.get("/", hasRole([3]), async (req, res) => {
     const queryResult = await pool.query("SELECT * FROM employee_info");
     res.json({ payload: queryResult });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        error: { message: error.sqlMessage || error, code: error.code },
-      });
+    res.status(500).json({
+      error: { message: error.sqlMessage || error, code: error.code },
+    });
+  }
+});
+
+router.get("/dashboard", hasRole([2, 3]), async (req, res) => {
+  try {
+    const queryResult = await pool.query(
+      "SELECT * FROM employee_info WHERE employeeId=?",
+      req.authData.sub
+    );
+    res.json({
+      payload: queryResult,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: { message: error.sqlMessage || error, code: error.code },
+    });
   }
 });
 
