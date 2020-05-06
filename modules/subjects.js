@@ -161,6 +161,26 @@ router.get("/:employeeId", hasRole([2, 3]), async (req, res) => {
   }
 });
 
+/****list subjects by employeeId(lecturer)****/
+router.get(
+  "/:employeeId/:subjectId/details",
+  hasRole([2, 3]),
+  async (req, res) => {
+    try {
+      const queryResult = await pool.query(
+        "SELECT DISTINCT *\
+     FROM subject_all_join WHERE lecturerId=? AND subjectId=?",
+        [req.params.employeeId, req.params.subjectId]
+      );
+      res.json({ payload: queryResult });
+    } catch (error) {
+      res.status(500).json({
+        error: { message: error.sqlMessage || error, code: error.code },
+      });
+    }
+  }
+);
+
 /****list all students in subject****/
 router.get("/:subjectId/students", hasRole([2, 3]), async (req, res) => {
   try {
