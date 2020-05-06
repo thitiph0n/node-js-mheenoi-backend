@@ -95,34 +95,35 @@ router.post("/", hasRole([2, 3]), async (req, res) => {
     } catch (error) {
       queryResult.push({ error: error });
     }
-    let hasError = false;
+    let hasError;
     queryResult.forEach(async (el) => {
       if (el.error) {
-        if (!hasError) {
-          try {
-            await pool.query(
-              "DELETE FROM subject\
+        hasError = el.error;
+        try {
+          await pool.query(
+            "DELETE FROM subject\
                 WHERE subjectId=?",
-              [payload.subjectId]
-            );
-            console.log("Roll back complete");
-          } catch (error) {
-            console.log(error);
-          }
-          res.status(500).json({
-            error: {
-              message: el.error.sqlMessage || el.error,
-              code: el.error.code,
-            },
-          });
-          hasError = true;
+            [payload.subjectId]
+          );
+          console.log("Roll back complete");
+        } catch (error) {
+          console.log(error);
+          hasError = el.error;
         }
       }
     });
+    console.log(hasError);
     if (!hasError) {
       res.status(201).json({
         status: "add subject successful",
         payload: queryResult,
+      });
+    } else {
+      res.status(500).json({
+        error: {
+          message: hasError.sqlMessage || hasError,
+          code: hasError.code,
+        },
       });
     }
   }
@@ -135,7 +136,11 @@ router.get("/", hasRole([2, 3]), async (req, res) => {
     res.json({ payload: queryResult });
   } catch (error) {
     res.status(500).json({
-      error: { message: error.sqlMessage || error, code: error.code },
+      error: {
+        message: error.sqlMessage || error,
+        code: error.code,
+        result: queryResult,
+      },
     });
   }
 });
