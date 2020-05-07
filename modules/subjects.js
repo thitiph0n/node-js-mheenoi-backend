@@ -190,7 +190,7 @@ router.get("/:subjectId/students", hasRole([2, 3]), async (req, res) => {
     left join enrollmentdetail on section.subjectId = enrollmentdetail.subjectId and section.sectionId = enrollmentdetail.sectionId\
     join enrollment on enrollment.enrollmentId = enrollmentdetail.enrollmentId\
     join student on student.studentId = enrollment.studentId\
-    where subject.subjectId = ? and enrollment.year = ? and enrollment.semester = ?',
+    where subject.subjectId = ? and enrollment.year = ? and enrollment.semester = ? and enrollment.status="completed"',
       [req.params.subjectId, globalConst.academicYear, globalConst.semester]
     );
     res.json({ payload: queryResult });
