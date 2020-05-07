@@ -69,22 +69,8 @@ app.get("/", (req, res) =>
 );
 
 app.get("/api", authorization, (req, res) =>
-  res.json({ api: "MHEENOI BACKEND", version: 0.3, authData: req.authData })
+  res.json({ api: "MHEENOI BACKEND", version: 0.5, authData: req.authData })
 );
-
-//Test functions
-app.post("/hashing", async (req, res) => {
-  const rawPassword = req.body.payload.password;
-  try {
-    const hashedPassword = await bcrypt.hash(rawPassword, 10);
-    res.json({
-      plaintext: rawPassword,
-      hashedPassword: hashedPassword,
-    });
-  } catch (error) {
-    res.sendStatus(500);
-  }
-});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Running on port ${PORT}`));
