@@ -24,7 +24,7 @@ router.get("/", hasRole([2, 3]), async (req, res) => {
         from subject join section on subject.subjectId = section.subjectId\
         left join enrollmentdetail on section.subjectId = enrollmentdetail.subjectId and section.sectionId = enrollmentdetail.sectionId\
         left join enrollment on enrollment.enrollmentId = enrollmentdetail.enrollmentId\
-        (year=? and enrollment.status = "completed") or year is null\
+        WHERE (year=? and enrollment.status = "completed") or year is null\
         group by subject.subjectId',
         globalConst.academicYear
       ),
