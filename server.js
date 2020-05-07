@@ -3,7 +3,6 @@ const express = require("express");
 const app = express();
 const authorization = require("./helpers/authorization");
 const cors = require("cors");
-const bcrypt = require("bcrypt");
 
 //import modules
 const students = require("./modules/students");
