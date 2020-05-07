@@ -20,12 +20,12 @@ router.get("/", hasRole([2, 3]), async (req, res) => {
       group by d.departmentId"
       ),
       await pool.query(
-        "select subject.subjectId,subject.subjectName,count(year) AS numberOfStudents\
+        'select subject.subjectId,subject.subjectName,count(year) AS numberOfStudents\
         from subject join section on subject.subjectId = section.subjectId\
         left join enrollmentdetail on section.subjectId = enrollmentdetail.subjectId and section.sectionId = enrollmentdetail.sectionId\
         left join enrollment on enrollment.enrollmentId = enrollmentdetail.enrollmentId\
-        where year=? or year is null\
-        group by subject.subjectId",
+        (year=? and enrollment.status = "completed") or year is null\
+        group by subject.subjectId',
         globalConst.academicYear
       ),
       await pool.query(
@@ -74,12 +74,12 @@ router.get("/student-in-dep", hasRole([2, 3]), async (req, res) => {
 router.get("/student-in-subject", hasRole([2, 3]), async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "select subject.subjectId,subject.subjectName,count(year) AS numberOfStudents\
+      'select subject.subjectId,subject.subjectName,count(year) AS numberOfStudents\
       from subject join section on subject.subjectId = section.subjectId\
       left join enrollmentdetail on section.subjectId = enrollmentdetail.subjectId and section.sectionId = enrollmentdetail.sectionId\
       left join enrollment on enrollment.enrollmentId = enrollmentdetail.enrollmentId\
-      where year=? or year is null\
-      group by subject.subjectId",
+      (year=? and enrollment.status = "completed") or year is null\
+      group by subject.subjectId',
       globalConst.academicYear
     );
     res.json({ payload: queryResult });
