@@ -11,7 +11,31 @@ router.use(authorization);
 /**create enrollmentId**/
 router.post("/create", hasRole([1]), async (req, res) => {
   try {
-    res.json({ message: "Enrollment" });
+    const queryResult = await pool.query(
+      "INSERT INTO enrollment(studentId,year,semester)\
+      SELECT * FROM (SELECT ? AS studentId, ? AS year, ? AS semester) AS tmp\
+      WHERE NOT EXISTS(\
+      SELECT studentId,year,semester FROM enrollment WHERE studentId = ? AND year=? AND semester=?) LIMIT 1;",
+      [
+        req.authData.sub,
+        globalConst.enrollYear,
+        globalConst.enrollSemester,
+        req.authData.sub,
+        globalConst.enrollYear,
+        globalConst.enrollSemester,
+      ]
+    );
+    res.status(201).json({
+      requestedTime: Date.now(),
+      requestedBy: req.authData.sub,
+      payload: {
+        result: queryResult,
+        message:
+          queryResult.affectedRows === 1
+            ? "create enrollmentId success"
+            : "You have already enroll this semester",
+      },
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
