@@ -122,16 +122,13 @@ router.post("/paying", hasRole([1]), async (req, res) => {
 router.get("/subjects/:subjectId", hasRole([1]), async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "select sub.subjectId,sub.subjectName,sub.credit,sub.description,sec.sectionId,sec.seat,sec_t.class,DAYNAME(sec_t.startTime) AS `weekday`,\
-      CAST(sec_t.`startTime` AS TIME) AS `startTime`,\
-      CAST(sec_t.`endTime` AS TIME) AS `endTime`,\
+      "select sub.subjectId,sub.subjectName,sub.credit,sub.description,sec.sectionId,sec.seat,\
       sec.seat - case when e.year = ? and e.semester = ? then count(e.enrollmentId)\
       else 0 end as remainSeat\
       from subject sub\
       join section sec on sec.subjectId = sub.subjectId\
       left join enrollmentdetail ed on ed.subjectId = sec.subjectId and ed.sectionId = sec.sectionId\
       left join enrollment e on e.enrollmentId = ed.enrollmentId\
-      join section_time sec_t on sec_t.subjectId = sec.subjectId and sec_t.sectionId = sec.sectionId  \
       group by sub.subjectId,sec.sectionId\
       having sub.subjectId = ?",
       [globalConst.enrollYear, globalConst.enrollSemester, req.params.subjectId]
@@ -156,12 +153,9 @@ router.get("/subjects/:subjectId", hasRole([1]), async (req, res) => {
 router.get("/:enrollmentId", hasRole([1]), async (req, res) => {
   try {
     const queryResult = await pool.query(
-      "select ed.enrollmentId,ed.subjectId,ed.sectionId,s.subjectName,s.description,s.credit,sec_t.class,DAYNAME(sec_t.startTime) AS `weekday`,\
-    CAST(sec_t.`startTime` AS TIME) AS `startTime`,\
-    CAST(sec_t.`endTime` AS TIME) AS `endTime`\
+      "select ed.enrollmentId,ed.subjectId,ed.sectionId,s.subjectName,s.description,s.credit\
     from enrollmentdetail ed\
     join subject s on s.subjectId = ed.subjectId\
-    join section_time sec_t on sec_t.subjectId = ed.subjectId and sec_t.sectionId = ed.sectionId\
     where ed.enrollmentId = ?",
       [req.params.enrollmentId]
     );
