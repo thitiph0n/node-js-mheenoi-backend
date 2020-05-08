@@ -175,7 +175,7 @@ router.get("/dashboard", hasRole([1]), async (req, res) => {
       [req.authData.sub, "approve", globalConst.academicYear]
     );
     const queryResult3 = await pool.query(
-      "select enrollment.year,enrollment.semester,enrollmentdetail.grade,enrollmentdetail.subjectId,subject.subjectName,enrollmentdetail.sectionId,employee.firstName,employee.lastName\
+      "select enrollment.year,enrollment.semester,enrollment.status,enrollmentdetail.grade,enrollmentdetail.subjectId,subject.subjectName,enrollmentdetail.sectionId,employee.firstName,employee.lastName\
       from enrollment\
       join enrollmentdetail on enrollment.enrollmentId = enrollmentdetail.enrollmentId\
       join subject on enrollmentdetail.subjectId=subject.subjectId\
@@ -200,6 +200,7 @@ router.get("/dashboard", hasRole([1]), async (req, res) => {
         scholarship: queryResult2,
         enrollment: queryResult3,
         gpa: queryResult4,
+        globalConst: globalConst,
       },
     });
   } catch (error) {
