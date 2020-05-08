@@ -40,7 +40,7 @@ router.post("/create", hasRole([1]), async (req, res) => {
         "SELECT enrollmentId FROM enrollment WHERE studentId = ? AND year=? AND semester=?",
         [req.authData.sub, globalConst.enrollYear, globalConst.enrollSemester]
       );
-      res.status(205).json({
+      res.status(200).json({
         requestedTime: Date.now(),
         requestedBy: req.authData.sub,
         payload: {
