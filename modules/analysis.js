@@ -26,7 +26,7 @@ router.get("/", hasRole([2, 3]), async (req, res) => {
         left join enrollment on enrollment.enrollmentId = enrollmentdetail.enrollmentId\
         WHERE (year=? and enrollment.status = "completed") or year is null\
         group by subject.subjectId',
-        globalConst.academicYear
+        globalConst.enrollYear
       ),
       await pool.query(
         "select l.scholarshipId,l.scholarshipName,\
